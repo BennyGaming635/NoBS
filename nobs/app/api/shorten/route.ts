@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { generateCode } from "../../lib/code";
-
-const UNLIMITED_USERS = new Set([
-  "aba56af3-7687-43f0-ac78-84c09c9e0baf", // Ben
-]);
+import { isUnlimitedUser } from "../../lib/unlimitedUsers";
 
 export async function POST(req: Request) {
   const { url, userId } = await req.json();
@@ -13,22 +10,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing data" }, { status: 400 });
   }
 
-  const isUnlimited = UNLIMITED_USERS.has(userId);
+  const cleanUserId = String(userId ?? "").trim();
+  const unlimitedUser = isUnlimitedUser(cleanUserId);
 
-  if (!isUnlimited) {
-    const { count, error: countError } = await supabaseAdmin
+  if (!unlimitedUser) {
+    const { count, error } = await supabaseAdmin
       .from("links")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", userId);
+      .eq("user_id", cleanUserId);
 
-    if (countError) {
-      return NextResponse.json(
-        { error: countError.message },
-        { status: 500 }
-      );
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    if ((count || 0) >= 10) {
+    if ((count ?? 0) >= 10) {
       return NextResponse.json(
         { error: "Limit reached (10 links)" },
         { status: 403 }
@@ -41,7 +36,7 @@ export async function POST(req: Request) {
   const { error } = await supabaseAdmin.from("links").insert({
     code,
     url,
-    user_id: userId,
+    user_id: cleanUserId,
   });
 
   if (error) {

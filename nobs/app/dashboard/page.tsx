@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
+import { isUnlimitedUser } from "../lib/unlimitedUsers";
 
 interface Link {
   id: string;
@@ -52,7 +53,7 @@ export default function Dashboard() {
       return;
     }
 
-    if (links.length >= 10) {
+    if (!isUnlimitedUser(user.id) && links.length >= 10) {
       setError("Limit reached (10 links)");
       setLoading(false);
       return;
@@ -114,7 +115,10 @@ export default function Dashboard() {
     <div className="container">
       <div className="card">
         <h1 className="title">Dashboard</h1>
-        <p className="subtitle">Links: {links.length}/10</p>
+        <p className="subtitle">
+          Links: {links.length}
+          {!isUnlimitedUser(user.id) ? "/10" : ""}
+        </p>
 
         <div className="inputRow">
           <input
