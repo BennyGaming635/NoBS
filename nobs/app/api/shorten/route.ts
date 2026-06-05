@@ -9,25 +9,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing data" }, { status: 400 });
   }
 
-  const { count } = await supabaseAdmin
-    .from("links")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userId);
-
-  if ((count || 0) >= 10) {
-    return NextResponse.json(
-      { error: "Limit reached (10 links)" },
-      { status: 403 }
-    );
-  }
-
   const code = generateCode();
 
-  await supabaseAdmin.from("links").insert({
+  const { error } = await supabaseAdmin.from("links").insert({
     code,
     url,
     user_id: userId,
   });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return NextResponse.json({
     code,
