@@ -13,10 +13,22 @@ export default function Home() {
 
     const res = await fetch("/api/shorten", {
       method: "POST",
-      body: JSON.stringify({ url }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url,
+      }),
     });
 
     const data = await res.json();
+
+    if (!res.ok) {
+      setResult(data.error || "Something went wrong");
+      setLoading(false);
+      return;
+    }
+
     setResult(data.shortUrl);
     setLoading(false);
   }

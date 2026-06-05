@@ -2,41 +2,32 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { generateCode } from "../../lib/code";
 
-async function codeExists(code: string) {
-  const { data, error } = await supabaseAdmin
-    .from("links")
-    .select("id")
-    .eq("code", code)
-    .maybeSingle();
-
-  if (error) return false;
-
-  return !!data;
-}
-
 export async function POST(req: Request) {
-  const { url } = await req.json();
+  const { url, userId } = await req.json();
 
-  if (!url) {
-    return NextResponse.json({ error: "Missing URL" }, { status: 400 });
+  if (!url || !userId) {
+    return NextResponse.json({ error: "Missing data" }, { status: 400 });
   }
 
-  let code = generateCode();
+  const { count } = await supabaseAdmin
+    .from("links")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
 
-  for (let i = 0; i < 5; i++) {
-    const exists = await codeExists(code);
-    if (!exists) break;
-    code = generateCode();
+  if ((count || 0) >= 10) {
+    return NextResponse.json(
+      { error: "Limit reached (10 links)" },
+      { status: 403 }
+    );
   }
 
-  const { error } = await supabaseAdmin.from("links").insert({
+  const code = generateCode();
+
+  await supabaseAdmin.from("links").insert({
     code,
     url,
+    user_id: userId,
   });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
 
   return NextResponse.json({
     code,
