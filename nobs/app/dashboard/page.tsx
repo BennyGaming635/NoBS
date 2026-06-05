@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 
@@ -79,6 +80,24 @@ export default function Dashboard() {
     setLoading(false);
   }
 
+    async function deleteLink(code: string) {
+    const { data: auth } = await supabase.auth.getUser();
+    const user = auth.user;
+
+    if (!user) return;
+
+    await fetch("/api/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+        code,
+        userId: user.id,
+        }),
+    });
+
+    await load();
+    }
+
   if (!user) {
     return (
       <div className="container">
@@ -117,11 +136,22 @@ export default function Dashboard() {
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {links.map((l) => (
-          <div key={l.id} className="result">
-            <a href={`/${l.code}`}>{l.code}</a>
-            <div style={{ fontSize: 12, color: "#888" }}>{l.url}</div>
-          </div>
-        ))}
+            <div key={l.id} className="result" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                <a href={`/${l.code}`}>{l.code}</a>
+                <div style={{ fontSize: 12, color: "#888" }}>{l.url}</div>
+                </div>
+
+                <Image
+                  src="/trash.png"
+                  alt="delete"
+                  width={18}
+                  height={18}
+                  onClick={() => deleteLink(l.code)}
+                  style={{ cursor: "pointer", opacity: 0.7 }}
+                />
+            </div>
+            ))}
       </div>
     </div>
   );
