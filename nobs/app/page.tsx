@@ -4,7 +4,7 @@ export default function Home() {
       <div className="card">
         <h1 className="title">NoBS</h1>
         <p className="description">Login to mange your links</p>
-
+        <br></br>
         <a className="button" href="/login">
           Login
         </a>
