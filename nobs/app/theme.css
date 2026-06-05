@@ -1,0 +1,13 @@
+:root {
+    --bg: #000;
+    --card: #0a0a0a;
+    --border: #1f1f1f;
+    --border-soft: #222;
+    --text: #fff;
+    --muted: #888;
+    --input: #111;
+    --input-border: #111;
+    --shadow: 0 0 40px rgba(255, 255, 255, 0.03);
+    --accent: #fff;
+    --accent-text: #000;
+}
