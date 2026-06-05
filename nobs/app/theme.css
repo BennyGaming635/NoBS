@@ -11,3 +11,9 @@
     --accent: #fff;
     --accent-text: #000;
 }
+
+html, body {
+  background: #000;
+  margin: 0;
+  padding: 0;
+}
