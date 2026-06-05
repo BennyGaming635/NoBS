@@ -8,21 +8,20 @@ async function getUrl(code: string) {
     .eq("code", code)
     .single();
 
-    if (error || !data) return null;
-
-    return data.url;
+  if (error || !data) return null;
+  return data.url;
 }
 
 export default async function Page({
-    params,
+  params,
 }: {
-    params: { code: string };
+  params: Promise<{ code: string }>;
 }) {
-    const url = await getUrl(params.code);
+  const { code } = await params;
+  const url = await getUrl(code);
+  if (!url) {
+    return <div>Link not found</div>;
+  }
 
-    if (!url) {
-        return <div>Link not found</div>
-    }
-
-    redirect(url);
+  redirect(url);
 }
