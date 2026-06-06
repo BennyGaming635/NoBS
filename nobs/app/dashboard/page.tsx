@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 import { isUnlimitedUser } from "../lib/unlimitedUsers";
@@ -105,7 +106,7 @@ export default function Dashboard() {
         <div className="card">
           <h1 className="title">NoBS</h1>
           <p className="subtitle">Not logged in</p>
-          <a href="/login">Login</a>
+          <Link href="/login">Login</Link>
         </div>
       </div>
     );
