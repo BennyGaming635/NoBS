@@ -1,0 +1,28 @@
+export const BAD_DOMAINS = [
+    "bit.ly",
+    "tinyurl.com",
+    "goo.gl",
+    "ow.ly",
+    "t.co",
+    "is.gd",
+    "buff.ly",
+    "adf.ly",
+    "bit.do",
+    "cutt.ly",
+    "shorte.st",
+    "clck.ru",
+    "soo.gd",
+    "s2r.co",
+    "u.to",
+    "lnkd.in",
+    "db.tt",
+    "qr.ae",
+    "adfoc.us",
+    "bc.vc",
+    "2.gp",
+    "x.co",
+    "ity.im",
+    "q.gs",
+]
+
+// List of domains that are not allowed to be shortened. This is to prevent abuse and to avoid shortening links that are already shortened by other services.
