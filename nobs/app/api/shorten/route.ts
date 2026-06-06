@@ -5,10 +5,17 @@ import { isUnlimitedUser } from "../../lib/unlimitedUsers";
 import { isRickroll } from "../../lib/rickroll";
 
 export async function POST(req: Request) {
-  const { url, userId } = await req.json();
+  const { url, userId, privacy, password } = await req.json();
 
   if (!url || !userId) {
     return NextResponse.json({ error: "Missing data" }, { status: 400 });
+  }
+
+  if (privacy === "password" && (!password || password.trim() === "")) {
+    return NextResponse.json(
+      { error: "Password required" },
+      { status: 400 }
+    );
   }
 
   const cleanUserId = String(userId ?? "").trim();
@@ -40,6 +47,8 @@ export async function POST(req: Request) {
     url,
     user_id: cleanUserId,
     is_rickroll: rickroll,
+    privacy: privacy ?? "public",
+    password: privacy === "password" ? password : null,
   });
 
   if (error) {

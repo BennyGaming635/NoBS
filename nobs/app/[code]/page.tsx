@@ -4,7 +4,7 @@ import { supabaseAdmin } from "../lib/supabaseAdmin";
 async function getLink(code: string) {
   const { data, error } = await supabaseAdmin
     .from("links")
-    .select("url, is_rickroll")
+    .select("url, is_rickroll, privacy, password")
     .eq("code", code)
     .single();
 
@@ -15,14 +15,70 @@ async function getLink(code: string) {
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ code: string }>;
+  searchParams?: Promise<{ password?: string }>;
 }) {
   const { code } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const submittedPassword = resolvedSearchParams?.password ?? "";
   const link = await getLink(code);
 
   if (!link) {
     return <div>Link not found</div>;
+  }
+
+  if (link.privacy === "password") {
+    if (!submittedPassword) {
+      return (
+        <div className="container">
+          <div className="card">
+            <h1 className="title">Password Required</h1>
+            <p className="subtitle">
+              This link is protected. Enter the password to continue.
+            </p>
+            <form method="get">
+              <input
+                className="input"
+                name="password"
+                type="password"
+                placeholder="Enter password"
+                autoComplete="current-password"
+                required
+              />
+              <button className="button" type="submit">
+                Continue
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    if (submittedPassword !== link.password) {
+      return (
+        <div className="container">
+          <div className="card">
+            <h1 className="title">Password Required</h1>
+            <p className="subtitle">That password was incorrect. Try again.</p>
+            <form method="get">
+              <input
+                className="input"
+                name="password"
+                type="password"
+                placeholder="Enter password"
+                autoComplete="current-password"
+                required
+              />
+              <button className="button" type="submit">
+                Continue
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
   }
 
   if (link.is_rickroll) {
