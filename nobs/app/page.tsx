@@ -1,15 +1,60 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "./lib/supabaseClient";
 
 export default function Home() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const check = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (data.session) {
+        router.push("/dashboard");
+      } else {
+        setLoading(false);
+      }
+    };
+
+    check();
+  }, [router]);
+
+  async function loginWithGitHub() {
+    await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+  }
+
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="card">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <div className="card">
         <h1 className="title">NoBS</h1>
-        <p className="description">Login to mange your links</p>
-        <br></br>
-        <Link className="button" href="/login">
+        <p className="description">
+          Login to manage your links
+        </p>
+
+        <button className="button" onClick={loginWithGitHub}>
           Login
-        </Link>
+        </button>
+
+        <br /><br />
+
+        <Link href="/dashboard">Go to Dashboard</Link>
       </div>
     </div>
   );
