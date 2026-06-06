@@ -11,6 +11,8 @@ interface Link {
   id: string;
   code: string;
   url: string;
+  privacy: string;
+  password: string | null;
   created_at: string;
 }
 
@@ -20,6 +22,8 @@ export default function Dashboard() {
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [privacy, setPrivacy] = useState("public");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     load();
@@ -66,6 +70,8 @@ export default function Dashboard() {
       body: JSON.stringify({
         url,
         userId: user.id,
+        privacy,
+        password,
       }),
     });
 
@@ -137,6 +143,29 @@ export default function Dashboard() {
             {loading ? "..." : "Shorten"}
           </button>
         </div>
+        <div style={{ marginTop: "12px" }}>
+          <select
+            className="input"
+            value={privacy}
+            onChange={(e) => setPrivacy(e.target.value)}
+            style={{ width: "100%" }}
+          >
+            <option value="public">Public</option>
+            <option value="password">Password Protected</option>
+          </select>
+        </div>
+
+        {privacy === "password" && (
+          <div style={{ marginTop: "12px" }}>
+            <input
+              className="input"
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+        )}
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
