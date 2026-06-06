@@ -3,6 +3,7 @@ import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { generateCode } from "../../lib/code";
 import { isUnlimitedUser } from "../../lib/unlimitedUsers";
 import { isRickroll } from "../../lib/rickroll";
+import { isBadDomain } from "../../lib/isBadDomain";
 
 export async function POST(req: Request) {
   const { url, userId, privacy, password } = await req.json();
@@ -41,12 +42,14 @@ export async function POST(req: Request) {
 
   const code = generateCode();
   const rickroll = isRickroll(url);
+  const badDomain = isBadDomain(url);
 
   const { error } = await supabaseAdmin.from("links").insert({
     code,
     url,
     user_id: cleanUserId,
     is_rickroll: rickroll,
+    is_bad_domain: badDomain,
     privacy: privacy ?? "public",
     password: privacy === "password" ? password : null,
   });
@@ -58,5 +61,6 @@ export async function POST(req: Request) {
     code,
     shortUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${code}`,
     isRickroll: rickroll,
+    isBadDomain: badDomain,
   });
 }

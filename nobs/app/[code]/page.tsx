@@ -4,7 +4,7 @@ import { supabaseAdmin } from "../lib/supabaseAdmin";
 async function getLink(code: string) {
   const { data, error } = await supabaseAdmin
     .from("links")
-    .select("url, is_rickroll, privacy, password")
+    .select("url, is_rickroll, is_bad_domain, privacy, password")
     .eq("code", code)
     .single();
 
@@ -81,19 +81,25 @@ export default async function Page({
     }
   }
 
-  if (link.is_rickroll) {
+  if (link.is_bad_domain || link.is_rickroll) {
     return (
       <div className="container">
         <div className="card">
-          <h1 className="title">Rickroll Warning</h1>
-          <p className="subtitle">
-            This destination appears to be a known Rickroll.
-          </p>
+          <h1 className="title">
+            {link.is_bad_domain ? "Unsafe Link Warning" : "Rickroll Warning"}
+          </h1>
+          {link.is_bad_domain ? (
+            <p className="subtitle">
+              This destination matches a known unsafe or suspicious domain.
+            </p>
+          ) : null}
+          {link.is_rickroll ? (
+            <p className="subtitle">
+              This destination appears to be a known Rickroll.
+            </p>
+          ) : null}
           <br></br>
-          <a
-            className="button"
-            href={link.url}
-          >
+          <a className="button" href={link.url}>
             Continue Anyway
           </a>
         </div>
