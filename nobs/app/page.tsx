@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="container">
@@ -5,9 +7,9 @@ export default function Home() {
         <h1 className="title">NoBS</h1>
         <p className="description">Login to mange your links</p>
         <br></br>
-        <a className="button" href="/login">
+        <Link className="button" href="/login">
           Login
-        </a>
+        </Link>
       </div>
     </div>
   );
