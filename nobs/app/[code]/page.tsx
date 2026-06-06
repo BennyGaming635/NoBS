@@ -33,7 +33,7 @@ export default async function Page({
           <p className="subtitle">
             This destination appears to be a known Rickroll.
           </p>
-
+          <br></br>
           <a
             className="button"
             href={link.url}
