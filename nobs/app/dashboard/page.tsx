@@ -170,6 +170,8 @@ export default function Dashboard() {
           </div>
         )}
 
+        <br></br>
+
         {isUnlimitedUser(user.id) && (
           <input
             className="input"
