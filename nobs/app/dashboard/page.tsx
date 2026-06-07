@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [privacy, setPrivacy] = useState("public");
   const [password, setPassword] = useState("");
+  const [alias, setAlias] = useState("");
 
   useEffect(() => {
     load();
@@ -165,6 +166,15 @@ export default function Dashboard() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+        )}
+
+        {isUnlimitedUser(user.id) && (
+          <input
+            className="input"
+            placeholder="Custom alias (optional)"
+            value={alias}
+            onChange={(e) => setAlias(e.target.value)}
+          />
         )}
 
         {error && <p style={{ color: "red" }}>{error}</p>}
