@@ -51,10 +51,6 @@ export default function Home() {
         <button className="button" onClick={loginWithGitHub}>
           Login
         </button>
-
-        <br /><br />
-
-        <Link href="/dashboard">Go to Dashboard</Link>
       </div>
     </div>
   );
