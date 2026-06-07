@@ -6,7 +6,7 @@ import { isRickroll } from "../../lib/rickroll";
 import { isBadDomain } from "../../lib/isBadDomain";
 
 export async function POST(req: Request) {
-  const { url, userId, privacy, password } = await req.json();
+  const { url, userId, privacy, password, alias } = await req.json();
 
   if (!url || !userId) {
     return NextResponse.json({ error: "Missing data" }, { status: 400 });
@@ -20,9 +20,44 @@ export async function POST(req: Request) {
   }
 
   const cleanUserId = String(userId ?? "").trim();
-  const unlimitedUser = isUnlimitedUser(cleanUserId);
+  const aliasAllowed = isUnlimitedUser(cleanUserId);
+  const cleanAlias = String(alias ?? "").trim();
 
-  if (!unlimitedUser) {
+  if (cleanAlias && !aliasAllowed) {
+    return NextResponse.json(
+      { error: "Custom aliases require unlimited access." },
+      { status: 403 }
+    );
+  }
+
+  const validAlias = /^[a-zA-Z0-9_-]+$/;
+
+  if (cleanAlias && !validAlias.test(cleanAlias)) {
+    return NextResponse.json({ error: "Invalid alias." }, { status: 400 });
+  }
+
+  const code = cleanAlias || generateCode();
+
+  if (cleanAlias) {
+    const { data: existing, error: existingError } = await supabaseAdmin
+      .from("links")
+      .select("id")
+      .eq("code", cleanAlias)
+      .maybeSingle();
+
+    if (existingError) {
+      return NextResponse.json({ error: existingError.message }, { status: 500 });
+    }
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Alias already taken." },
+        { status: 409 }
+      );
+    }
+  }
+
+  if (!aliasAllowed) {
     const { count, error } = await supabaseAdmin
       .from("links")
       .select("*", { count: "exact", head: true })
@@ -40,7 +75,6 @@ export async function POST(req: Request) {
     }
   }
 
-  const code = generateCode();
   const rickroll = isRickroll(url);
   const badDomain = isBadDomain(url);
 

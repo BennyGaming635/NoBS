@@ -73,6 +73,7 @@ export default function Dashboard() {
         userId: user.id,
         privacy,
         password,
+        alias: isUnlimitedUser(user.id) ? alias : undefined,
       }),
     });
 
@@ -85,6 +86,7 @@ export default function Dashboard() {
     }
 
     setUrl("");
+    setAlias("");
     await load();
     setLoading(false);
   }
