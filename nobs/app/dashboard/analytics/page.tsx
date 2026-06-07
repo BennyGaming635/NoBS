@@ -89,7 +89,7 @@ export default function AnalyticsPage() {
       <div className="card wide">
         <div className="header">
           <h1 className="title">Analytics</h1>
-
+          <br></br>
           <Link href="/dashboard" className="button">
             Back
           </Link>
