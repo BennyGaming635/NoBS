@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { supabaseAdmin } from "../lib/supabaseAdmin";
 
 async function getLink(code: string) {
@@ -106,6 +107,14 @@ export default async function Page({
       </div>
     );
   }
+
+  await supabaseAdmin
+    .from("link_visits")
+    .insert({
+      link_id: (link as { id?: string }).id,
+      code: code,
+      user_agent: (await headers()).get("user-agent"),
+    });
 
   redirect(link.url);
 }
