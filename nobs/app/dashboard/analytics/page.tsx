@@ -76,10 +76,12 @@ export default function AnalyticsPage() {
     0
   );
 
-  const topLink = enrichedLinks.reduce(
-    (max, l) => (l.clicks > (max?.clicks || 0) ? l : max),
-    enrichedLinks[0]
-  );
+  const topLink =
+  enrichedLinks.length > 0
+    ? enrichedLinks.reduce((max, l) =>
+        l.clicks > max.clicks ? l : max
+      )
+    : null;
 
   return (
     <div className="container">
@@ -116,16 +118,18 @@ export default function AnalyticsPage() {
           )}
 
           {enrichedLinks.map((link) => (
-            <div key={link.id} className="result">
-              <strong>
-                <a href={`/${link.code}`}>
+            <div key={link.id} className="linkCard">
+              <div className="topRow">
+                <a className="short" href={`/${link.code}`}>
                   bgbs.au/{link.code}
                 </a>
-              </strong>
 
-              <div className="muted">{link.url}</div>
+                <span className="clicks">
+                  {link.clicks} clicks
+                </span>
+              </div>
 
-              <div>{link.clicks} clicks</div>
+              <div className="long">{link.url}</div>
             </div>
           ))}
         </div>
@@ -134,9 +138,7 @@ export default function AnalyticsPage() {
           <h2>Recent Visits</h2>
 
           {visits.length === 0 && (
-            <div className="result">
-              No visits recorded.
-            </div>
+            <div className="result">No visits recorded.</div>
           )}
 
           {visits
@@ -146,12 +148,10 @@ export default function AnalyticsPage() {
                 new Date(b.visited_at).getTime() -
                 new Date(a.visited_at).getTime()
             )
-            .slice(0, 50)
-            .map((visit, i) => (
-              <div key={i} className="result">
-                {new Date(
-                  visit.visited_at
-                ).toLocaleString()}
+            .slice(0, 20)
+            .map((visit) => (
+              <div key={visit.id} className="visitRow">
+                {new Date(visit.visited_at).toLocaleString()}
               </div>
             ))}
         </div>
