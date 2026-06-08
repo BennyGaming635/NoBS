@@ -5,7 +5,7 @@ import { supabaseAdmin } from "../lib/supabaseAdmin";
 async function getLink(code: string) {
   const { data, error } = await supabaseAdmin
     .from("links")
-    .select("url, is_rickroll, is_bad_domain, privacy, password")
+    .select("id, url, is_rickroll, is_bad_domain, privacy, password")
     .eq("code", code)
     .single();
 
@@ -108,13 +108,11 @@ export default async function Page({
     );
   }
 
-  await supabaseAdmin
-    .from("link_visits")
-    .insert({
-      link_id: (link as { id?: string }).id,
-      code: code,
-      user_agent: (await headers()).get("user-agent"),
-    });
+  await supabaseAdmin.from("link_visits").insert({
+  link_id: link.id,
+  code,
+  user_agent: (await headers()).get("user-agent"),
+});
 
-  redirect(link.url);
+  return redirect(link.url);
 }
