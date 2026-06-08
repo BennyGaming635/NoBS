@@ -1,0 +1,33 @@
+# TODO List
+Stuff that needs to be added or has been added
+- [x] URL Shortening
+    - [x] Custom handles
+- [x] Buy bgbs.au domain
+    - [x] Change to Vercel DNS
+- [x] Privacy settings
+    - [x] Password protected pages
+- [x] Filters
+    - [x] Rickroll filter
+    - [x] Bad domain filter (mainly other link-shortners)
+- [x] Link Limits (10)
+    - [x] Limit of 10 for regular users
+    - [x] Limit of ∞ for admin users
+- [ ] Paid Plans
+    - [ ] Setup Stripe to let users pay
+    - [ ] Let paid users have unlimited links
+    - [ ] Limit custom handles to paid users
+- [x] Analytics
+    - [x] Collect link clicks
+    - [x] Show total links
+    - [x] Show total link clicks
+- [x] Login
+    - [x] Auto-login redirect with GitHub
+    - [x] Fall-back login page
+    - [ ] Alternative login methods
+        - [ ] Google
+        - [ ] Microsoft
+        - [ ] idk what else?
+- [ ] Support
+    - [ ] Online support portal
+    - [ ] AI Chatbot /j
+    - [ ] Email host instead of personal email
