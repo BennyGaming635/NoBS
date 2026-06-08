@@ -8,7 +8,6 @@ interface ShortLink {
   id: string;
   code: string;
   url: string;
-  clicks: number;
 }
 
 interface Visit {
@@ -23,8 +22,6 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
-
     const loadAnalytics = async () => {
       const { data: auth } = await supabase.auth.getUser();
       const user = auth.user;
@@ -36,17 +33,12 @@ export default function AnalyticsPage() {
 
       const { data: linksData } = await supabase
         .from("links")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("clicks", { ascending: false });
+        .select("id, code, url")
+        .eq("user_id", user.id);
 
       const { data: visitsData } = await supabase
         .from("link_visits")
-        .select("*")
-        .order("visited_at", { ascending: false })
-        .limit(100);
-
-      if (!isMounted) return;
+        .select("id, link_id, visited_at");
 
       setLinks(linksData || []);
       setVisits(visitsData || []);
@@ -54,25 +46,7 @@ export default function AnalyticsPage() {
     };
 
     void loadAnalytics();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
-
-  const totalLinks = links.length;
-
-  const totalClicks = links.reduce(
-    (sum, link) => sum + (link.clicks || 0),
-    0
-  );
-
-  const topLink =
-    links.length > 0
-      ? links.reduce((a, b) =>
-          (a.clicks || 0) > (b.clicks || 0) ? a : b
-        )
-      : null;
 
   if (loading) {
     return (
@@ -84,12 +58,34 @@ export default function AnalyticsPage() {
     );
   }
 
+  const clickMap: Record<string, number> = {};
+
+  for (const v of visits) {
+    clickMap[v.link_id] = (clickMap[v.link_id] || 0) + 1;
+  }
+
+  const enrichedLinks = links.map((l) => ({
+    ...l,
+    clicks: clickMap[l.id] || 0,
+  }));
+
+  const totalLinks = links.length;
+
+  const totalClicks = Object.values(clickMap).reduce(
+    (a, b) => a + b,
+    0
+  );
+
+  const topLink = enrichedLinks.reduce(
+    (max, l) => (l.clicks > (max?.clicks || 0) ? l : max),
+    enrichedLinks[0]
+  );
+
   return (
     <div className="container">
       <div className="card wide">
         <div className="header">
           <h1 className="title">Analytics</h1>
-          <br></br>
           <Link href="/dashboard" className="button">
             Back
           </Link>
@@ -112,46 +108,24 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {topLink && (
-          <div className="section">
-            <h2>Most Clicked Link</h2>
-
-            <div className="result">
-              <strong>
-                <a href={`/${topLink.code}`}>
-                  bgbs.au/{topLink.code}
-                </a>
-              </strong>
-
-              <div>{topLink.url}</div>
-
-              <div>{topLink.clicks} clicks</div>
-            </div>
-          </div>
-        )}
-
         <div className="section">
           <h2>Links</h2>
 
-          {links.length === 0 && (
-            <div className="result">
-              No links yet.
-            </div>
+          {enrichedLinks.length === 0 && (
+            <div className="result">No links yet.</div>
           )}
 
-          {links.map((link) => (
+          {enrichedLinks.map((link) => (
             <div key={link.id} className="result">
-              <div>
-                <strong>
-                  <a href={`/${link.code}`}>
-                    bgbs.au/{link.code}
-                  </a>
-                </strong>
-              </div>
+              <strong>
+                <a href={`/${link.code}`}>
+                  bgbs.au/{link.code}
+                </a>
+              </strong>
 
               <div className="muted">{link.url}</div>
 
-              <div>{link.clicks || 0} clicks</div>
+              <div>{link.clicks} clicks</div>
             </div>
           ))}
         </div>
@@ -165,41 +139,23 @@ export default function AnalyticsPage() {
             </div>
           )}
 
-          {visits.map((visit) => (
-            <div key={visit.id} className="result">
-              {new Date(
-                visit.visited_at
-              ).toLocaleString()}
-            </div>
-          ))}
+          {visits
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(b.visited_at).getTime() -
+                new Date(a.visited_at).getTime()
+            )
+            .slice(0, 50)
+            .map((visit, i) => (
+              <div key={i} className="result">
+                {new Date(
+                  visit.visited_at
+                ).toLocaleString()}
+              </div>
+            ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .stats {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-          margin-top: 24px;
-        }
-
-        .stat {
-          background: #111;
-          border: 1px solid #222;
-          border-radius: 12px;
-          padding: 16px;
-        }
-
-        .stat h2 {
-          margin: 0;
-          font-size: 28px;
-        }
-
-        .stat p {
-          margin: 6px 0 0;
-          color: #888;
-        }
-      `}</style>
     </div>
   );
 }
