@@ -126,9 +126,6 @@ export default function Dashboard() {
       <div className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
         <h1 className="title">Dashboard</h1>
-          <Link href="/dashboard/analytics" className="button">
-            Analytics
-          </Link>
         </div>
         <p className="subtitle">
           Links: {links.length}
