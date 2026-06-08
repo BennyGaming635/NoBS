@@ -14,6 +14,13 @@ async function getLink(code: string) {
   return data;
 }
 
+function normalizeUrl(url: string) {
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return "https://" + url;
+  }
+  return url;
+}
+
 export default async function Page({
   params,
   searchParams,
@@ -100,7 +107,7 @@ export default async function Page({
             </p>
           ) : null}
           <br></br>
-          <a className="button" href={link.url}>
+          <a className="button" href={normalizeUrl(link.url)}>
             Continue Anyway
           </a>
         </div>
@@ -114,5 +121,5 @@ export default async function Page({
   user_agent: (await headers()).get("user-agent"),
 });
 
-  return redirect(link.url);
+  return redirect(normalizeUrl(link.url));
 }
