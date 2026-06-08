@@ -29,7 +29,7 @@ If you really need higher limits for links, you will either need to be a maintai
 The limits are on by default at 10 to stop the service from being used maliciously, and also remember that at all times, we serve the right to delete links at any point in time.
 
 ## What's next?
-The next plans of what to add are filters for malware and bad-domains similar to the rickroll filter, but will either block the creation or just also prompt the user to be cautious. I also plan to eventually add analytics to links only for when links are clicked. The project could also evolve to have a reporting system, but it's limitless on what can be added next.
+I've moved all forms of stuff I think should be added next to the new TODO list which you can [access here](TODO.md).
 
 ## For Horizons peeps
-Uhh normally I would link to Lapse timelapses here, but I don't have any at the moment, so please watch [this instead](https://bgbs.vercel.app/6I1dcZ). (yes yes very funny).
+Uhh normally I would link to Lapse timelapses here, but I don't have any at the moment, so please watch [this instead](https://bgbs.au/chip). (talk about talk about talk about talk about)...
